@@ -2,6 +2,8 @@
 
 Biblioteca Livre Internacional 5.0.5
 
+## IMPORTANTE
+Use o branch 5.x para as últimas modificaçes e correções de bug. :)
 
 ## Dependências
 
