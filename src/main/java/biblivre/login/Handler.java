@@ -73,13 +73,6 @@ public class Handler extends AbstractHandler {
 			if (atps.isAdmin()) {
 				boolean warningPassword = password.toLowerCase().equals("abracadabra");
 				request.setSessionAttribute(schema, "system_warning_password", warningPassword);
-
-				String latestVersion = Updates.checkUpdates();
-				latestVersion = StringUtils.chomp(latestVersion);
-
-				if (StringUtils.isNotBlank(latestVersion) && !latestVersion.equals(Constants.BIBLIVRE_VERSION) && NaturalOrderComparator.NUMERICAL_ORDER.compare(latestVersion, Constants.BIBLIVRE_VERSION) > 0) {
-					request.setSessionAttribute(schema, "system_warning_new_version", latestVersion);
-				}
 			}
 
 			if (!schema.equals(Constants.GLOBAL_SCHEMA)) {
