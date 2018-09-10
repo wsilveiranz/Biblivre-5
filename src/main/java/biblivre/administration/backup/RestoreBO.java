@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PipedReader;
+import java.io.PipedWriter;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Date;
@@ -35,6 +37,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -282,34 +286,21 @@ public class RestoreBO extends AbstractBO {
 
 		pb.redirectErrorStream(true);
 
-		BufferedWriter bw = null;
+		Process p;
 
 		try {
+			p = pb.start();
+		} catch (IOException ioe) {
+			return false;
+		}
+
+		try (
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "UTF-8"));
+			) {
+
 			State.writeLog("Starting psql");
 
-			Process p = pb.start();
-
-			InputStreamReader isr = new InputStreamReader(p.getInputStream(), "UTF-8");
-			final BufferedReader br = new BufferedReader(isr);
-
-			OutputStreamWriter osw = new OutputStreamWriter(p.getOutputStream(), "UTF-8");
-			bw = new BufferedWriter(osw);
-
-			Thread t = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					String outputLine;
-					try {
-						while ((outputLine = br.readLine()) != null) {
-							State.writeLog(outputLine);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-
-			t.start();
+			State.attachLogMonitor(p);
 
 			// Preprocessing renames
 			for (String originalSchemaName : preRenameSchemas.keySet()) {
@@ -318,6 +309,7 @@ public class RestoreBO extends AbstractBO {
 				State.writeLog("Renaming schema " + originalSchemaName + " to " + finalSchemaName);
 				bw.write("ALTER SCHEMA \"" + originalSchemaName + "\" RENAME TO \"" + finalSchemaName + "\";\n");
 			}
+
 			bw.flush();
 
 			if (restoreSchemas.containsKey(Constants.GLOBAL_SCHEMA)) {
@@ -357,6 +349,7 @@ public class RestoreBO extends AbstractBO {
 				State.writeLog("Renaming schema " + renamedSchemaName + " to " + originalSchemaName);
 				bw.write("ALTER SCHEMA \"" + renamedSchemaName + "\" RENAME TO \"" + originalSchemaName + "\";\n");
 			}
+
 			bw.flush();
 
 			// Postprocessing renames
@@ -366,8 +359,8 @@ public class RestoreBO extends AbstractBO {
 				State.writeLog("Renaming schema " + renamedSchemaName + " to " + originalSchemaName);
 				bw.write("ALTER SCHEMA \"" + renamedSchemaName + "\" RENAME TO \"" + originalSchemaName + "\";\n");
 			}
-			bw.flush();
 
+			bw.flush();
 			
 			// Postprocessing deletes
 			for (String originalSchemaName : deleteSchemas.keySet()) {
@@ -384,6 +377,7 @@ public class RestoreBO extends AbstractBO {
 					bw.write("DELETE FROM \"" + Constants.GLOBAL_SCHEMA + "\".schemas WHERE \"schema\" = '" + originalSchemaName + "';\n");
 				}
 			}
+
 			bw.flush();
 			
 			for (String originalSchemaName : restoreSchemas.keySet()) {
@@ -416,8 +410,6 @@ public class RestoreBO extends AbstractBO {
 			this.logger.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
 			this.logger.error(e.getMessage(), e);
-		} finally {
-			IOUtils.closeQuietly(bw);
 		}
 
 		return false;
@@ -454,30 +446,15 @@ public class RestoreBO extends AbstractBO {
 
 		try {
 			p = pb.start();
+
+			State.attachLogMonitor(p);
 		} catch (IOException ioe) {
 			return false;
 		}
 
 		try (
 				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "UTF-8"));
-				final BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
 			) {
-
-			Thread t = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					String outputLine;
-					try {
-						while ((outputLine = br.readLine()) != null) {
-							State.writeLog(outputLine);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-
-			t.start();
 
 			if (tryPGSQL92) {
 				bw.write("SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'biblivre4_b3b_restore' AND pid <> pg_backend_pid();\n");
@@ -531,34 +508,21 @@ public class RestoreBO extends AbstractBO {
 
 		pb.redirectErrorStream(true);
 
-		BufferedWriter bw = null;
-		BufferedReader sqlBr = null;
+		Process p;
 
 		try {
-			Process p = pb.start();
+			p = pb.start();
 
-			InputStreamReader isr = new InputStreamReader(p.getInputStream(), "UTF-8");
+			State.attachLogMonitor(p);
+		} catch (IOException ioe) {
+			return false;
+		}
 
-			OutputStreamWriter osw = new OutputStreamWriter(p.getOutputStream(), "UTF-8");
-			bw = new BufferedWriter(osw);
+		try (
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "UTF-8"));
+				BufferedReader sqlBr = new BufferedReader(new InputStreamReader(new FileInputStream(sql), "UTF-8"));
+			) {
 
-			Thread t = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					String outputLine;
-					try (final BufferedReader br = new BufferedReader(isr)){
-						while ((outputLine = br.readLine()) != null) {
-							State.writeLog(outputLine);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-
-			t.start();
-
-			sqlBr = new BufferedReader(new InputStreamReader(new FileInputStream(sql), "UTF-8"));
 			String inputLine;
 			boolean validBackup = false;
 
@@ -615,9 +579,6 @@ public class RestoreBO extends AbstractBO {
 			this.logger.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
 			this.logger.error(e.getMessage(), e);
-		} finally {
-			IOUtils.closeQuietly(bw);
-			IOUtils.closeQuietly(sqlBr);
 		}
 
 		return false;

@@ -40,6 +40,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
 
+import biblivre.administration.setup.State;
 import biblivre.core.AbstractBO;
 import biblivre.core.configurations.Configurations;
 import biblivre.core.file.DatabaseFile;
@@ -296,22 +297,16 @@ public class BackupBO extends AbstractBO {
 
 		pb.redirectErrorStream(true);
 
-		BufferedReader br = null;
+		Process p;
 
 		try {
-			Process p = pb.start();
+			p = pb.start();
+		} catch (IOException ioe) {
+			return false;
+		}
 
-			InputStreamReader isr = new InputStreamReader(p.getInputStream());
-			br = new BufferedReader(isr);
-			String line;
-			
-			while ((line = br.readLine()) != null) {
-				//There was a system.out.println here for the 'line' var, 
-				//with a FIX_ME tag.  So I changed it to logger.debug().
-				if (this.logger.isDebugEnabled()) {
-					this.logger.debug(line);
-				}
-			}
+		try {
+			State.attachLogMonitor(p);
 
 			p.waitFor();
 			
@@ -320,8 +315,6 @@ public class BackupBO extends AbstractBO {
 			this.logger.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
 			this.logger.error(e.getMessage(), e);
-		} finally {
-			IOUtils.closeQuietly(br);
 		}
 
 		return false;

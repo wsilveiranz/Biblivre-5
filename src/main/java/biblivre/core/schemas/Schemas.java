@@ -261,34 +261,23 @@ public class Schemas extends StaticBO {
 
 		pb.redirectErrorStream(true);
 
-		BufferedWriter bw = null;
+		Process p;
 
 		try {
+			p = pb.start();
+
+			State.attachLogMonitor(p);
+		} catch (IOException ioe) {
+			return false;
+		}
+
+
+		try (
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "UTF-8"));
+			) {
+
 			State.writeLog("Starting psql");
 
-			Process p = pb.start();
-
-			InputStreamReader isr = new InputStreamReader(p.getInputStream(), "UTF-8");
-
-			OutputStreamWriter osw = new OutputStreamWriter(p.getOutputStream(), "UTF-8");
-			bw = new BufferedWriter(osw);
-
-			Thread t = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					String outputLine;
-					try (final BufferedReader br = new BufferedReader(isr)) {
-						while ((outputLine = br.readLine()) != null) {
-							State.writeLog(outputLine);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-
-			t.start();
 
 			if (Schemas.exists(dto.getSchema())) {
 				State.writeLog("Dropping old schema");
@@ -322,8 +311,6 @@ public class Schemas extends StaticBO {
 			Schemas.logger.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
 			Schemas.logger.error(e.getMessage(), e);
-		} finally {
-			IOUtils.closeQuietly(bw);
 		}
 
 		return false;
