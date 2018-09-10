@@ -22,6 +22,8 @@ package biblivre.administration.setup;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
@@ -115,7 +117,8 @@ public class State {
 				final BufferedReader br = new BufferedReader(
 						new InputStreamReader(p.getInputStream(), "UTF-8"));
 		) {
-			br.lines().forEach(line -> State.writeLog(line));
+			Executor executor = Executors.newSingleThreadExecutor();
+			executor.execute(() -> br.lines().forEach(line -> State.writeLog(line)));
 		}
 	}
 }
