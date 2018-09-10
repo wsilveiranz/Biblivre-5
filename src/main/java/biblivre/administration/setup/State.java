@@ -19,6 +19,9 @@
  ******************************************************************************/
 package biblivre.administration.setup;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
@@ -105,5 +108,14 @@ public class State {
 		
 		State.log.append(message).append("\n");
 		State.lastMessage = message;
+	}
+
+	public static void attachLogMonitor(Process p) throws IOException {
+		try (
+				final BufferedReader br = new BufferedReader(
+						new InputStreamReader(p.getInputStream(), "UTF-8"));
+		) {
+			br.lines().forEach(line -> State.writeLog(line));
+		}
 	}
 }
