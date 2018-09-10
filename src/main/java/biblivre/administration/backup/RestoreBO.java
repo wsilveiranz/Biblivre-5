@@ -267,7 +267,6 @@ public class RestoreBO extends AbstractBO {
 
 		String[] commands = new String[] {
 			psql.getAbsolutePath(),		// 0
-			"--single-transaction",		// 1
 			"--host",					// 2
 			"localhost",				// 3
 			"--port",					// 4
@@ -301,7 +300,6 @@ public class RestoreBO extends AbstractBO {
 			) {
 
 			State.writeLog("Starting psql");
-
 
 			// Preprocessing renames
 			for (String originalSchemaName : preRenameSchemas.keySet()) {
