@@ -290,6 +290,8 @@ public class RestoreBO extends AbstractBO {
 
 		try {
 			p = pb.start();
+
+			State.attachLogMonitor(p);
 		} catch (IOException ioe) {
 			return false;
 		}
@@ -300,7 +302,6 @@ public class RestoreBO extends AbstractBO {
 
 			State.writeLog("Starting psql");
 
-			State.attachLogMonitor(p);
 
 			// Preprocessing renames
 			for (String originalSchemaName : preRenameSchemas.keySet()) {
