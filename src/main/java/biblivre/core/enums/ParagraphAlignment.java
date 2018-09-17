@@ -10,7 +10,7 @@ public enum ParagraphAlignment {
 	ALIGN_LEFT,
 	ALIGN_RIGHT,
 	ALIGN_UNDEFINED;
-	
+
 	public Optional<Integer> getAlignment() {
 		try {
 			return Optional.of(Element.class.getField(this.name()).getInt(null));
