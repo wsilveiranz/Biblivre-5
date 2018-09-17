@@ -534,12 +534,12 @@
 			<div class="fields">
 				<div>
 					<div class="label"><i18n:text key="administration.configuration.original_value" /></div>
-					<div class="value"><i18n:text key="administration.configuration.label_print.align_center" /></div>
+					<div class="value"><i18n:text key="administration.configuration.label_print.ALIGN_CENTER" /></div>
 					<div class="clear"></div>
 				</div>
 				<div>
 					<div class="label"><i18n:text key="administration.configuration.current_value" /></div>
-					<div class="value"><i18n:text key="administration.configuration.label_print.${value.toLowerCase}"/></div>
+					<div class="value"><i18n:text key="administration.configuration.label_print.${value}"/></div>
 					<div class="clear"></div>
 				</div>
 				<div>

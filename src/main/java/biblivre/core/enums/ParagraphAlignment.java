@@ -8,8 +8,7 @@ public enum ParagraphAlignment {
 	ALIGN_JUSTIFIED,
 	ALIGN_JUSTIFIED_ALL,
 	ALIGN_LEFT,
-	ALIGN_RIGHT,
-	ALIGN_UNDEFINED;
+	ALIGN_RIGHT;
 
 	public Optional<Integer> getAlignment() {
 		try {
