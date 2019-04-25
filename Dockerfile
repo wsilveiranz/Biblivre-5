@@ -15,7 +15,7 @@ ENTRYPOINT echo "listen_addresses = '*'" >> /etc/postgresql/9.6/main/postgresql.
 &&	mvn sass:update-stylesheets package -Ddebug=true \
 &&	su postgres -c "psql -U postgres -f sql/createdatabase.sql" \
 &&	su postgres -c "psql -U postgres -f sql/biblivre4.sql -d biblivre4" \
-&&  cp target/Biblivre4.war $CATALINA_HOME/webapps \
+&&  cp $(build.artifactstagingdirectory)/target/Biblivre4.war $CATALINA_HOME/webapps \
 &&	catalina.sh run
 
 EXPOSE 8080
