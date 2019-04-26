@@ -9,7 +9,7 @@ ENTRYPOINT echo "listen_addresses = '*'" >> /etc/postgresql/9.6/main/postgresql.
 && 	echo "host    all             all              0.0.0.0/0                       md5" >> /etc/postgresql/9.6/main/pg_hba.conf \
 && 	/etc/init.d/postgresql start \
 &&	wget https://github.com/$GITHUB_USER/Biblivre-5/archive/$BRANCH_NAME.zip \
-&&	unzip Biblivre-5-$BRANCH_NAME.zip -d /tmp && rm $BRANCH_NAME.zip \
+&&	unzip $BRANCH_NAME.zip -d /tmp && rm $BRANCH_NAME.zip \
 &&	cd /tmp/Biblivre-5-$BRANCH_NAME/lib/ \
 &&	sh maven_deps.sh \
 &&	cd .. \
