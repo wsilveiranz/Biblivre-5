@@ -1,6 +1,8 @@
 FROM cleydyr/tomcat:7-jdk8
 RUN apt-get update
 RUN apt-get install -y maven postgresql
+RUN mkdir /src/
+COPY Biblivre4.war /scr/
 ENV GITHUB_USER cleydyr
 ENV BRANCH_NAME 5.x
 ENV JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"
@@ -15,7 +17,7 @@ ENTRYPOINT echo "listen_addresses = '*'" >> /etc/postgresql/9.6/main/postgresql.
 &&	mvn sass:update-stylesheets package -Ddebug=true \
 &&	su postgres -c "psql -U postgres -f sql/createdatabase.sql" \
 &&	su postgres -c "psql -U postgres -f sql/biblivre4.sql -d biblivre4" \
-&&  cp target/Biblivre4.war $CATALINA_HOME/webapps \
+&&  cp /src/Biblivre4.war $CATALINA_HOME/webapps \
 &&	catalina.sh run
 
 EXPOSE 8080
