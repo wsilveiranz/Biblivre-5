@@ -1,8 +1,9 @@
 FROM cleydyr/tomcat:7-jdk8
 RUN apt-get update
 RUN apt-get install -y maven postgresql
-RUN mkdir /src/
-COPY Biblivre4.war /scr/
+RUN mkdir /src
+COPY Biblivre4.war /scr
+RUN ls /src
 ENV GITHUB_USER cleydyr
 ENV BRANCH_NAME 5.x
 ENV JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"
