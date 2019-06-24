@@ -255,7 +255,7 @@ public class Schemas extends StaticBO {
 		ProcessBuilder pb = new ProcessBuilder(commands);
 
 		pb.environment().put("PGDATABASE", "biblivre4");
-		pb.environment().put("PGUSER", "biblivre");
+		pb.environment().put("PGUSER", "biblivre@brasileirinhobiblivre");
 		pb.environment().put("PGPASSWORD", "abracadabra");
 
 		pb.redirectErrorStream(true);
