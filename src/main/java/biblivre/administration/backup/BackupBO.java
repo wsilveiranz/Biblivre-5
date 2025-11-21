@@ -310,7 +310,7 @@ public class BackupBO extends AbstractBO {
 		ProcessBuilder pb = new ProcessBuilder(commands);
 
 		pb.environment().put("PGDATABASE", "biblivre4");
-		pb.environment().put("PGUSER", "brasileirinhobiblivre");
+		pb.environment().put("PGUSER", "biblivre");
 		pb.environment().put("PGPASSWORD", "abracadabra");
 		pb.environment().put("PGSSLMODE", "require");
 		pb.environment().put("PGHOST", "brasileirinhobiblivre.postgres.database.azure.com");
