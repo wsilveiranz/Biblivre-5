@@ -31,15 +31,11 @@
 	<repositories>
 		<repository>
 			<id>clojars.org</id>
-			<url>http://clojars.org/repo</url>
-		</repository>
-		<repository>
-			<id>k-int.com</id>
-			<url>http://developer.k-int.com/maven2/</url>
+			<url>https://repo.clojars.org</url>
 		</repository>
 		<repository>
 			<id>central</id>
-			<url>http://central.maven.org/maven2/</url>
+			<url>https://repo.maven.apache.org/maven2/</url>
 		</repository>
 	</repositories>
 
@@ -148,9 +144,9 @@
 		</dependency -->
 
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc4</version>
+			<version>42.7.3</version>
 		</dependency>
 
 		<!--dependency>

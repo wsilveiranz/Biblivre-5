@@ -42,6 +42,7 @@ import biblivre.core.configurations.Configurations;
 import biblivre.core.file.DatabaseFile;
 import biblivre.core.schemas.Schemas;
 import biblivre.core.utils.Constants;
+import biblivre.core.utils.DatabaseConfig;
 import biblivre.core.utils.DatabaseUtils;
 import biblivre.core.utils.FileIOUtils;
 import biblivre.core.utils.Pair;
@@ -309,9 +310,7 @@ public class BackupBO extends AbstractBO {
 	private boolean dumpDatabase(String[] commands) {
 		ProcessBuilder pb = new ProcessBuilder(commands);
 
-		pb.environment().put("PGDATABASE", "biblivre4");
-		pb.environment().put("PGUSER", "biblivre@brasileirinhobiblivre");
-		pb.environment().put("PGPASSWORD", "abracadabra");
+		DatabaseConfig.configurePgEnvironment(pb);
 
 		pb.redirectErrorStream(true);
 		

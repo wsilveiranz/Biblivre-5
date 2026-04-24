@@ -41,6 +41,7 @@ import biblivre.core.Updates;
 import biblivre.core.configurations.Configurations;
 import biblivre.core.exceptions.ValidationException;
 import biblivre.core.utils.Constants;
+import biblivre.core.utils.DatabaseConfig;
 import biblivre.core.utils.DatabaseUtils;
 import br.org.biblivre.z3950server.Z3950ServerBO;
 
@@ -243,9 +244,9 @@ public class Schemas extends StaticBO {
 		String[] commands = new String[] { psql.getAbsolutePath(), // 0
 				"--single-transaction", // 1
 				"--host", // 2
-				"localhost", // 3
+				DatabaseConfig.getHost(), // 3
 				"--port", // 4
-				"5432", // 5
+				DatabaseConfig.getPort(), // 5
 				"-v", // 6
 				"ON_ERROR_STOP=1", // 7
 				"--file", // 8
@@ -254,9 +255,7 @@ public class Schemas extends StaticBO {
 
 		ProcessBuilder pb = new ProcessBuilder(commands);
 
-		pb.environment().put("PGDATABASE", "biblivre4");
-		pb.environment().put("PGUSER", "biblivre@brasileirinhobiblivre");
-		pb.environment().put("PGPASSWORD", "abracadabra");
+		DatabaseConfig.configurePgEnvironment(pb);
 
 		pb.redirectErrorStream(true);
 
